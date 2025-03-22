@@ -81,6 +81,8 @@
             android:visibility="gone"
             android:gravity="center_horizontal">
 
+
+
             <ProgressBar
                 android:id="@+id/loadingBar"
                 android:layout_width="wrap_content"
@@ -115,13 +117,25 @@
 
             <Button
                 android:id="@+id/nextQuestionButton"
-                android:layout_width="match_parent"
+                android:layout_width="190dp"
                 android:layout_height="wrap_content"
                 android:text="➡ Next Question"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="24dp"
                 android:visibility="gone"
-                android:backgroundTint="#005C97"
+                android:background="@drawable/option_button"
                 android:textColor="#FFFFFF" />
+            <Button
+                android:id="@+id/skipButton"
+                android:layout_width="190dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/option_button"
+                android:text="⏭️ Skip"
+                android:textColor="#FFFFFF"
+                android:visibility="gone" />
+
         </LinearLayout>
 
         <!-- 🏆 Results Screen -->
@@ -144,10 +158,13 @@
 
             <Button
                 android:id="@+id/restartButton"
-                android:layout_width="match_parent"
+                android:layout_width="190dp"
                 android:layout_height="wrap_content"
                 android:text="🔄 Play Again"
-                android:backgroundTint="#00796B"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="24dp"
+                android:visibility="gone"
+                android:background="@drawable/option_button"
                 android:textColor="#FFFFFF" />
         </LinearLayout>
     </LinearLayout>

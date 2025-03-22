@@ -1,3 +1,4 @@
+// TriviaAppActivity.java (with Skip Button integrated)
 package com.example.quiz_app;
 
 import android.os.Bundle;
@@ -23,7 +24,7 @@ public class TriviaAppActivity extends AppCompatActivity {
 
     private LinearLayout introLayout, quizLayout, resultsLayout, optionsContainer;
     private TextView questionTextView, loadingText, resultsTextView;
-    private Button startButton, nextButton, restartButton;
+    private Button startButton, nextButton, restartButton, skipButton;
     private ProgressBar loadingBar;
     private final List<UserAnswer> userAnswers = new ArrayList<>();
     private int score = 0;
@@ -66,6 +67,7 @@ public class TriviaAppActivity extends AppCompatActivity {
         startButton = findViewById(R.id.startButton);
         nextButton = findViewById(R.id.nextQuestionButton);
         restartButton = findViewById(R.id.restartButton);
+        skipButton = findViewById(R.id.skipButton);
         loadingBar = findViewById(R.id.loadingBar);
 
         startButton.setOnClickListener(v -> {
@@ -76,6 +78,10 @@ public class TriviaAppActivity extends AppCompatActivity {
 
         nextButton.setOnClickListener(v -> {
             nextButton.setVisibility(View.GONE);
+            fetchTriviaQuestion();
+        });
+
+        skipButton.setOnClickListener(v -> {
             fetchTriviaQuestion();
         });
 
@@ -124,12 +130,34 @@ public class TriviaAppActivity extends AppCompatActivity {
         optionsContainer.removeAllViews();
 
         for (String option : trivia.getOptions()) {
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            cardParams.setMargins(0, 0, 0, 16);
+            card.setLayoutParams(cardParams);
+            card.setBackgroundResource(R.drawable.option_card_background);
+            card.setElevation(6f);
+            card.setPadding(12, 12, 12, 12);
+
             Button optionButton = new Button(this);
             optionButton.setText(option);
+            optionButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+            optionButton.setTextColor(getResources().getColor(android.R.color.white));
+            optionButton.setTextSize(16f);
+            optionButton.setAllCaps(false);
+            optionButton.setPadding(8, 8, 8, 8);
+            optionButton.setBackground(null);
             optionButton.setOnClickListener(v -> checkAnswer(optionButton));
-            optionButton.setBackgroundResource(R.drawable.option_button);
-            optionsContainer.addView(optionButton);
+
+            card.addView(optionButton);
+            optionsContainer.addView(card);
         }
+
+        nextButton.setVisibility(View.GONE);
+        skipButton.setVisibility(View.VISIBLE);
     }
 
     private void checkAnswer(Button selectedButton) {
@@ -137,23 +165,28 @@ public class TriviaAppActivity extends AppCompatActivity {
         boolean isCorrect = selectedAnswer.equals(currentCorrectAnswer);
 
         if (isCorrect) {
-            selectedButton.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+            selectedButton.setBackgroundResource(R.drawable.option_correct);
             score++;
         } else {
-            selectedButton.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+            selectedButton.setBackgroundResource(R.drawable.option_wrong);
             for (int i = 0; i < optionsContainer.getChildCount(); i++) {
-                Button btn = (Button) optionsContainer.getChildAt(i);
+                LinearLayout card = (LinearLayout) optionsContainer.getChildAt(i);
+                Button btn = (Button) card.getChildAt(0);
                 if (btn.getText().toString().equals(currentCorrectAnswer)) {
-                    btn.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+                    btn.setBackgroundResource(R.drawable.option_correct);
                 }
             }
         }
 
         for (int i = 0; i < optionsContainer.getChildCount(); i++) {
-            optionsContainer.getChildAt(i).setEnabled(false);
+            LinearLayout card = (LinearLayout) optionsContainer.getChildAt(i);
+            Button btn = (Button) card.getChildAt(0);
+            btn.setEnabled(false);
         }
 
         userAnswers.add(new UserAnswer(currentQuestionText, selectedAnswer, currentCorrectAnswer));
+
+        skipButton.setVisibility(View.GONE);
 
         if (questionCount >= totalQuestions) {
             new Handler(Looper.getMainLooper()).postDelayed(this::showResults, 1000);
@@ -179,18 +212,14 @@ public class TriviaAppActivity extends AppCompatActivity {
     private void showLoading(boolean isLoading) {
         loadingBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         loadingText.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-
-
         questionTextView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         optionsContainer.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-
         if (isLoading) {
             startLoadingAnimation();
         } else {
             stopLoadingAnimation();
         }
     }
-
 
     private void startLoadingAnimation() {
         loadingIndex = 0;

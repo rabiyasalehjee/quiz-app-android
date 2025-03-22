@@ -17,9 +17,9 @@ public interface ApiService {
 
         public static ApiService create() {
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .connectTimeout(90, TimeUnit.SECONDS)
-                    .readTimeout(90, TimeUnit.SECONDS)
-                    .writeTimeout(90, TimeUnit.SECONDS)
+                    .connectTimeout(190, TimeUnit.SECONDS)
+                    .readTimeout(190, TimeUnit.SECONDS)
+                    .writeTimeout(190, TimeUnit.SECONDS)
                     .build();
 
             Retrofit retrofit = new Retrofit.Builder()
