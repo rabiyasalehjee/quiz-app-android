@@ -34,7 +34,7 @@ Follow the setup guide in that repo to install the required model `(e.g., deepse
 python flask_api.py
 ```
 🛠 Tech Stack
-    -Java + Android SDK (App)
-    -Retrofit2 for networking
-    -Local Flask API (Backend)
-    -Ollama + deepseek-r1:1.5b (LLM model for trivia generation)
+- Java + Android SDK (App)
+- Retrofit2 for networking
+- Local Flask API (Backend)
+- Ollama + deepseek-r1:1.5b (LLM model for trivia generation)
