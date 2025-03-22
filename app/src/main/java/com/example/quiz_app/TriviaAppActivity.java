@@ -1,4 +1,3 @@
-// TriviaAppActivity.java (Enhanced Full Version with Intro, Restart, Loading Animation)
 package com.example.quiz_app;
 
 import android.os.Bundle;
@@ -180,12 +179,18 @@ public class TriviaAppActivity extends AppCompatActivity {
     private void showLoading(boolean isLoading) {
         loadingBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         loadingText.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+
+
+        questionTextView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        optionsContainer.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+
         if (isLoading) {
             startLoadingAnimation();
         } else {
             stopLoadingAnimation();
         }
     }
+
 
     private void startLoadingAnimation() {
         loadingIndex = 0;
