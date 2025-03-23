@@ -1,4 +1,3 @@
-// TriviaAppActivity.java (with Skip Button integrated)
 package com.example.quiz_app;
 
 import android.os.Bundle;
@@ -23,13 +22,16 @@ import retrofit2.Response;
 public class TriviaAppActivity extends AppCompatActivity {
 
     private LinearLayout introLayout, quizLayout, resultsLayout, optionsContainer;
+    private LinearLayout resultsContainer;
+    private TextView scoreTextView;
+
     private TextView questionTextView, loadingText, resultsTextView;
     private Button startButton, nextButton, restartButton, skipButton;
     private ProgressBar loadingBar;
     private final List<UserAnswer> userAnswers = new ArrayList<>();
     private int score = 0;
     private int questionCount = 0;
-    private final int totalQuestions = 5;
+    private final int totalQuestions = 2;
 
     private ApiService apiService;
     private String currentCorrectAnswer = "";
@@ -62,13 +64,15 @@ public class TriviaAppActivity extends AppCompatActivity {
 
         questionTextView = findViewById(R.id.questionTextView);
         loadingText = findViewById(R.id.loadingText);
-        resultsTextView = findViewById(R.id.resultsTextView);
 
         startButton = findViewById(R.id.startButton);
         nextButton = findViewById(R.id.nextQuestionButton);
         restartButton = findViewById(R.id.restartButton);
         skipButton = findViewById(R.id.skipButton);
         loadingBar = findViewById(R.id.loadingBar);
+        resultsContainer = findViewById(R.id.resultsContainer);
+        scoreTextView = findViewById(R.id.scoreTextView);
+
 
         startButton.setOnClickListener(v -> {
             introLayout.setVisibility(View.GONE);
@@ -100,6 +104,10 @@ public class TriviaAppActivity extends AppCompatActivity {
     }
 
     private void fetchTriviaQuestion() {
+        questionTextView.setText("");
+        optionsContainer.removeAllViews();
+        nextButton.setVisibility(View.GONE);
+        skipButton.setVisibility(View.GONE);
         showLoading(true);
         Call<TriviaQuestion> call = apiService.getTriviaQuestion();
         call.enqueue(new Callback<TriviaQuestion>() {
@@ -117,7 +125,12 @@ public class TriviaAppActivity extends AppCompatActivity {
             public void onFailure(Call<TriviaQuestion> call, Throwable t) {
                 showLoading(false);
                 questionTextView.setText("Network error. Please try again.");
+                optionsContainer.removeAllViews();
+                skipButton.setVisibility(View.GONE);
+                nextButton.setVisibility(View.GONE);
+                t.printStackTrace();
             }
+
         });
     }
 
@@ -198,27 +211,63 @@ public class TriviaAppActivity extends AppCompatActivity {
     private void showResults() {
         quizLayout.setVisibility(View.GONE);
         resultsLayout.setVisibility(View.VISIBLE);
+        resultsContainer.removeAllViews();
 
-        StringBuilder resultText = new StringBuilder();
-        resultText.append("Your Score: ").append(score).append(" / ").append(totalQuestions).append("\n\n");
+        scoreTextView.setText("Your Score: " + score + " / " + totalQuestions);
+
         for (UserAnswer ua : userAnswers) {
-            resultText.append("Q: ").append(ua.getQuestion()).append("\n")
-                    .append("Your Answer: ").append(ua.getUserAnswer()).append("\n")
-                    .append("Correct Answer: ").append(ua.getCorrectAnswer()).append("\n\n");
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setBackgroundResource(R.drawable.option_card_background); // reuse existing card bg
+            card.setPadding(20, 20, 20, 20);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 0, 0, 24);
+            card.setLayoutParams(params);
+            card.setElevation(8f);
+
+            TextView questionView = new TextView(this);
+            questionView.setText("Q: " + ua.getQuestion());
+            questionView.setTextColor(getResources().getColor(android.R.color.white));
+            questionView.setTextSize(16f);
+            questionView.setTypeface(null, android.graphics.Typeface.BOLD);
+            questionView.setPadding(0, 0, 0, 8);
+
+            TextView userAnswerView = new TextView(this);
+            userAnswerView.setText("Your Answer: " + ua.getUserAnswer());
+            userAnswerView.setTextColor(
+                    ua.getUserAnswer().equals(ua.getCorrectAnswer())
+                            ? getResources().getColor(android.R.color.holo_green_light)
+                            : getResources().getColor(android.R.color.holo_red_light)
+            );
+
+            TextView correctAnswerView = new TextView(this);
+            correctAnswerView.setText("Correct Answer: " + ua.getCorrectAnswer());
+            correctAnswerView.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+
+            card.addView(questionView);
+            card.addView(userAnswerView);
+            card.addView(correctAnswerView);
+
+            resultsContainer.addView(card);
         }
-        resultsTextView.setText(resultText.toString());
     }
+
 
     private void showLoading(boolean isLoading) {
         loadingBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         loadingText.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         questionTextView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         optionsContainer.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        skipButton.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         if (isLoading) {
             startLoadingAnimation();
         } else {
             stopLoadingAnimation();
         }
+        restartButton.setVisibility(View.VISIBLE);
     }
 
     private void startLoadingAnimation() {

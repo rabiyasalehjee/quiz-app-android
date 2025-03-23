@@ -11,6 +11,8 @@ An engaging Android trivia app powered by a local LLM-based backend. The app del
 - Score summary with detailed answer review
 - Smooth UI transitions with animated loading messages
 
+![UI Preview](ui-preview.png)
+
 ## 📲 How to Run This App
 
 ### 1. Clone the Android App Repo
